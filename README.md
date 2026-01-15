@@ -46,10 +46,28 @@ cmd/scanner/main.go should not be modified
 
 ---
 
-Please upload the code to a publicly accessible GitHub, GitLab or other public code repository account. This README file should be updated, briefly documenting your solution. Like our own code, we expect testing instructions: whether it’s an automated test framework, or simple manual steps.
 
-To help set expectations, we believe you should aim to take no more than 4 hours on this task.
+## Solution
+- `cmd/processor` implements a Pub/Sub consumer that decodes scan messages and keeps the latest scan per `(ip, port, service)` based on `timestamp`.
+- `pkg/storage` provides a `Store` interface with file (`FileStore`) and SQLite (`SQLiteStore`) implementations to make storage swapping.
 
-We understand that you have other responsibilities, so if you think you’ll need more than 5 business days, just let us know when you expect to send a reply.
 
-Please don’t hesitate to ask any follow-up questions for clarification.
+## How to Run
+
+1. Start the emulator, topic/subscription creation, and scanner:
+   ```bash
+   docker compose up
+   ```
+2. In another shell, run the processor:
+   - For File storage:
+
+      ```bash
+         PUBSUB_EMULATOR_HOST=localhost:8085 go run ./cmd/processor --store-type=file --store-path=data/file_recs.json
+      ```
+   - For SQL Lite storage:
+
+      ```bash
+       PUBSUB_EMULATOR_HOST=localhost:8085 go run ./cmd/processor --store-type=sqlite --store-path=data/sqllite_recs.db
+      ```      
+
+3. Inspect the stored results at `data/file_recs.json` or `data/sqllite_recs.db`.
